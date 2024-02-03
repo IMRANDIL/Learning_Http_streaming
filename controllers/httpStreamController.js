@@ -1,5 +1,6 @@
 const path = require("path");
 const fs = require("fs");
+const ffmpeg = require('fluent-ffmpeg');
 
 exports.httpStreamController = async (req, res, next) => {
   try {
@@ -16,21 +17,25 @@ exports.storeBlobController = async (req, res, next) => {
       if (!fs.existsSync(uploadsDirectory)) {
         fs.mkdirSync(uploadsDirectory);
       }
-    // Get the video blob from the request
-    const videoBlob = req.file.buffer;
-
-    // Generate a unique filename (you might want to use a more robust method)
-    const filename = `video_${Date.now()}.webm`;
-
-    // Specify the path where you want to store the video
-    const filePath = path.join(uploadsDirectory, filename);
-
-    // Write the video blob to the file system
-    fs.writeFileSync(filePath, videoBlob);
-    // Respond with a success message
-    res
-      .status(200)
-      .json({ message: "Video successfully stored on the server." });
+      const videoBlob = req.file.buffer;
+      const timestamp = Date.now();
+  
+      // Save the original webm file
+      const originalFilePath = path.join(uploadsDirectory, `video_${timestamp}.webm`);
+      fs.writeFileSync(originalFilePath, videoBlob);
+  
+      // Convert to mp4
+      const mp4FilePath = path.join(uploadsDirectory, `video_${timestamp}.mp4`);
+      await new Promise((resolve, reject) => {
+        ffmpeg()
+          .input(originalFilePath)
+          .output(mp4FilePath)
+          .on('end', resolve)
+          .on('error', reject)
+          .run();
+      });
+// Respond with a success message
+res.status(200).json({ message: "Video successfully stored on the server." });  
   } catch (error) {
     console.error("Error storing video:", error);
     res.status(500).json({ error: "Internal Server Error" });
