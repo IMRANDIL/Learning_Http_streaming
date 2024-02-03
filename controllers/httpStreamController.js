@@ -11,6 +11,11 @@ exports.httpStreamController = async (req, res, next) => {
 
 exports.storeBlobController = async (req, res, next) => {
   try {
+      // Create 'uploads' directory if it doesn't exist
+      const uploadsDirectory = path.join(__dirname, '..', 'uploads');
+      if (!fs.existsSync(uploadsDirectory)) {
+        fs.mkdirSync(uploadsDirectory);
+      }
     // Get the video blob from the request
     const videoBlob = req.file.buffer;
 
@@ -18,7 +23,7 @@ exports.storeBlobController = async (req, res, next) => {
     const filename = `video_${Date.now()}.webm`;
 
     // Specify the path where you want to store the video
-    const filePath = path.join(__dirname, "uploads", filename);
+    const filePath = path.join(uploadsDirectory, filename);
 
     // Write the video blob to the file system
     fs.writeFileSync(filePath, videoBlob);

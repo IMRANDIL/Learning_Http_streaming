@@ -41,12 +41,33 @@ const CameraStream = () => {
     }
   };
 
-  const handleDataAvailable = (event) => {
+  const handleDataAvailable = async(event) => {
     console.log('event>>>>>>>>>>>>>>>>>>>>>>', event);
     if (event.data.size > 0) {
-      // Handle the recorded video data, e.g., send it to the server
-      // In this example, we log the data to the console
-      console.log('Recorded data:', event.data);
+     // Handle the recorded video data
+    const videoBlob = event.data;
+
+    // Create a FormData object to send the video as part of the request payload
+    const formData = new FormData();
+    formData.append('video', videoBlob, 'recorded-video.webm');
+    try {
+      // Send the video data to the backend using fetch or another HTTP client
+      const response = await fetch('http://localhost:5001/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      console.log('response>>>>>>>>>>>>>>>>>>>',response)
+      // Check the response from the server
+      if (response.ok) {
+        console.log('Video successfully sent to the backend.');
+      } else {
+        console.error('Error sending video to the backend:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error sending video to the backend:', error);
+    }
+
+
     }
   };
 
