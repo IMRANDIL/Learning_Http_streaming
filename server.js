@@ -11,7 +11,12 @@ const server = http.createServer(app);
 const PORT = process.env.PORT || 6003;
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({extended: true}))
+app.use(express.urlencoded({extended: true}));
+
+
+
+
+app.use('/api', require('./routers/httpStreamRouter'))
 
 server.listen(PORT, ()=>{
     console.log(`Server runs on port: ${PORT}`);

@@ -1,21 +1,21 @@
 import React, { useRef, useState } from 'react';
 
-
 const CameraStream = () => {
   const videoRef = useRef();
   const mediaRecorderRef = useRef(null);
   const [isCameraOn, setIsCameraOn] = useState(false);
 
-
-const toggleCamera = async () => {
+  const toggleCamera = async () => {
     try {
       if (isCameraOn) {
         // Stop the camera stream and recording
         const tracks = videoRef.current.srcObject.getTracks();
         tracks.forEach((track) => track.stop());
-        mediaRecorderRef.current.stop();
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+          mediaRecorderRef.current.stop();
+        }
       } else {
-        // Start the camera stream and recording
+        // Start the camera stream
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
 
         if (videoRef.current) {
@@ -28,7 +28,9 @@ const toggleCamera = async () => {
           mediaRecorderRef.current.ondataavailable = handleDataAvailable;
 
           // Start recording
-          mediaRecorderRef.current.start();
+          if (mediaRecorderRef.current.state === 'inactive') {
+            mediaRecorderRef.current.start();
+          }
         }
       }
 
@@ -38,7 +40,9 @@ const toggleCamera = async () => {
       console.error('Error accessing camera:', error);
     }
   };
+
   const handleDataAvailable = (event) => {
+    console.log('event>>>>>>>>>>>>>>>>>>>>>>', event);
     if (event.data.size > 0) {
       // Handle the recorded video data, e.g., send it to the server
       // In this example, we log the data to the console
@@ -48,14 +52,13 @@ const toggleCamera = async () => {
 
   return (
     <>
-    <button className={!isCameraOn ? 'start-button' : 'close-button'} onClick={toggleCamera}>
-        {!isCameraOn ? `Start Camera` : `Off Camera`}
+      <button className={!isCameraOn ? 'start-button' : 'close-button'} onClick={toggleCamera}>
+        {!isCameraOn ? `Start Recording` : `Stop Recording`}
       </button>
-    <div className="camera-stream-container">
-      <h1 className="header">Camera Streaming</h1>
-      
-      <video ref={videoRef} className="camera-stream" autoPlay playsInline></video>
-    </div>
+      <div className="camera-stream-container">
+        <h1 className="header">Camera Streaming</h1>
+        <video ref={videoRef} className="camera-stream" autoPlay playsInline></video>
+      </div>
     </>
   );
 };
