@@ -6,26 +6,7 @@ const CameraStream = () => {
   const mediaRecorderRef = useRef(null);
   const [isCameraOn, setIsCameraOn] = useState(false);
 
-//   const startCamera = async () => {
-//     try {
-//       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
 
-//       if (videoRef.current) {
-//         videoRef.current.srcObject = stream;
-
-//         // Create a MediaRecorder instance to record the video stream
-//         mediaRecorderRef.current = new MediaRecorder(stream);
-
-//         // Handle data available events
-//         mediaRecorderRef.current.ondataavailable = handleDataAvailable;
-
-//         // Start recording
-//         mediaRecorderRef.current.start();
-//       }
-//     } catch (error) {
-//       console.error('Error accessing camera:', error);
-//     }
-//   };
 const toggleCamera = async () => {
     try {
       if (isCameraOn) {
