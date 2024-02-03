@@ -1,11 +1,12 @@
 import './App.css'
-
+import CameraStream  from './components/CameraStream'
 function App() {
 
 
   return (
     <>
-      <div>hi ali</div>
+     
+      <CameraStream/>
     </>
   )
 }
